@@ -46,10 +46,21 @@
     <div id="exp_screen_progress"><br/></div>
     <div id="footer"></div>
   </div>
+  <script type="text/javascript" src="js/jquery.slim.min.js"></script>
   <script type="text/javascript" src="js/modernizr.js"></script>
   <script type="text/javascript" src="js/experimentA.js"></script>
   <script type="text/javascript" src="js/experimentB.js"></script>
   <script type="text/javascript" src="js/labclock.js"></script>
   <script type="text/javascript">window.onload = labclock.start();</script>
+  <script>
+    $(document).keyup(function(e) {
+     if (e.key === "Escape") { // escape key maps to keycode `27`
+        // <DO YOUR WORK HERE>
+          var exit = confirm('Are you sure you wish to exit the experiment and download the csv file for the completed attemps? If so, click OK.');
+          if(exit) labclock.storeExperimentData(true);
+      }
+    });
+    
+  </script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 <?php
 	//data to be filled
 	//<configuration>
-	$fromEmailAdress = "server@labpsico.com";
-	$toEmailAdress = "garaizar@deusto.es";
+	$fromEmailAdress = "slomayesva@email.arizona.edu";
+	$toEmailAdress = "slomayesva@email.arizona.edu";
 	$experimentCode = "LIBET-001 - WEB";
 	$subjectEmail = "EXPERIMENTAL DATA: " . experimentCode . " //" + date;
 	$domain = "deusto.es";

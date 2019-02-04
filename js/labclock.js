@@ -121,7 +121,7 @@ var labclock = {
   },
   playReady: function (i) {
     i = i || 1; 
-    this.audioGetReadyElements[--i].play();
+    // this.audioGetReadyElements[--i].play();
     this.state = this.STATE_TRIAL_RUNNING;
     this.startClock();
   },
@@ -398,7 +398,7 @@ var labclock = {
     this.expScreenTitle.innerHTML = this.experiment.phases[i].screen.title;
     this.expScreenContent.innerHTML = this.experiment.phases[i].screen.content;
   },
-  storeExperimentData: function () {
+  storeExperimentData: function (earlyExit = false) {
     var results = '',
         resultsEnd = 'Full results;',
         xhr, storageItem;
@@ -446,6 +446,13 @@ var labclock = {
         alert(this.experiment.messages.errorAJAX);
       }
     } 
+    this.createCSV(results, earlyExit);
+    if (Modernizr.localstorage) {
+      window.localStorage.setItem(storageItem, results);
+    }
+  },
+  createCSV: function(results, earlyExit = false){
+    // console.log(results);
     if (this.experiment.generateCSV || !this.experiment.postResultsURL) {
       // Show CSV link in a new post-screen
       var screen = {
@@ -453,9 +460,7 @@ var labclock = {
         content: '<p><a href="data:text/csv;base64,' + window.btoa(results) + '">' + this.experiment.messages.downloadData + '</a></p>'
       };
       this.experiment.postScreens.push(screen);
-    }
-    if (Modernizr.localstorage) {
-      window.localStorage.setItem(storageItem, results);
+      if(earlyExit) $('#content').html(screen.content);
     }
   },
   showPostScreen: function (i) {
@@ -689,3 +694,5 @@ var labclock = {
     }
   }
 };
+
+

@@ -18,8 +18,7 @@ experiment.B = {
       { file: 'media/250-440Hz_44100Hz_16bit_1000ms.wav' }
     ],
     getReady: [
-      { file: 'media/250-440Hz_44100Hz_16bit_1000ms.wav' },
-      { file: 'media/500-880Hz_44100Hz_16bit_1000ms.wav' }
+      { file: '' }
     ],
     feedback: [
       { duration: 200 /*in msec*/, pitch: 1000 /*in Hz*/ },
@@ -47,24 +46,24 @@ experiment.B = {
   preScreens: [
     {
       title: 'Welcome',
-      content: '<p><strong>LabClock 1.4.7</strong><br/><a href="http://www.labpsico.deusto.es/">Labpsico</a>, 2018<br/><br/>Developed by Pablo Garaizar<br/>garaizar@deusto.es<br/><a href="http://www.deusto.es/">Universidad de Deusto</a><br/>Bilbao, Spain</p><br/><br/><br/><p>Before you start, please check if the <strong>audio is activated </strong> and choose <strong>appropriate volume</strong>.</p><br/><button id="demosound" onclick="labclock.playDemo()">Play demo sound</button><br/><br/><p>Press \'Next\' to continue...</p>'
-    },
-    {
-      title: 'Thank you',
-      content: '<p>We would like to thank you for taking part in this experiment. Without the help of people like you our research would not be possible.</p><br/><p>In this task there are no good or bad responses. What we are investigating are basic psychological processes that occur similarly in all individuals. </p><br/><p>If you\'d like to participate it is important that you do it with true interest. You do not need to tell us your name, and the responses that you will give through the experiment will be added to those of the other participants and analyzed statistically. Your participation in this experiment is <em>anonimous</em> and <em>voluntary</em>.</p><br/><p>If you agree to participate, press \'Next\'.</p>'
-    },
-    {
-      title: 'Instructions',
-      content: '<p>At the beginning of each trial of the experiment an analog clock face will be shown at the screen.</p><br/><p>A tone and a message will advise that in a few second the clock will start running.</p><br/><p>The rotary spot will complete two laps around the clock face before it will stop.</p><br/><p>Your task is to press the SPACEBAR in any moment of the SECOND LAP.</p><br/><p>At the end of the trial, you will be asked about the MOMENT that you DECIDED to press the spacebar, and then you will hace to click the clock\'s face to mark that moment.</p><br/><p>Once you have marked it, the trial will end and eventually another trial will start.</p>'
-    },
-    {
-      title: 'Instructions',
-      content: '<p>Sometimes a brief tone is played during the trials. Therefore, it is necessary to use headphones and set the volume properly to listen to these tones.</p><br/><p>If you forget to press the spacebar during the second lap in any trial, the next trial will be shown.</p><br/><p>It is important that you keep your eyes focused on the center of the clock and try not to blink during each trial.</p><br/><br/><br/><br/><br/><p>In the following screen a clock in demo mode will be shown to get used to it.</p>'
-    },
-    {
-      title: 'Demo',
-      content: '<p>Clock in demo mode. Press \'Next\' once you undestand how it works.</p><div id="demo_clock"><div id="demo_marks"><img src="img/dot.png" width="510" height="510"  id="demo_dot"/></div></div>'
+      content: '<p><strong>LabClock 1.4.7</strong><br/><a href="http://www.labpsico.deusto.es/">Labpsico</a>, 2018<br/><br/>Developed by Pablo Garaizar<br/>garaizar@deusto.es<br/><a href="http://www.deusto.es/">Universidad de Deusto</a><br/>Bilbao, Spain</p><br/><p>Customized for the University of Arizona Consciousness Action Time Lab by Steven Horkey.</p><br/><br/><p>Before you start, please check if the <strong>audio is activated </strong> and choose <strong>appropriate volume</strong>.</p><br/><button id="demosound" onclick="labclock.playDemo()">Play demo sound</button><br/><br/><p>Press \'Next\' to continue...</p>'
     }
+    // {
+    //   title: 'Thank you',
+    //   content: '<p>We would like to thank you for taking part in this experiment. Without the help of people like you our research would not be possible.</p><br/><p>In this task there are no good or bad responses. What we are investigating are basic psychological processes that occur similarly in all individuals. </p><br/><p>If you\'d like to participate it is important that you do it with true interest. You do not need to tell us your name, and the responses that you will give through the experiment will be added to those of the other participants and analyzed statistically. Your participation in this experiment is <em>anonimous</em> and <em>voluntary</em>.</p><br/><p>If you agree to participate, press \'Next\'.</p>'
+    // },
+    // {
+    //   title: 'Instructions',
+    //   content: '<p>At the beginning of each trial of the experiment an analog clock face will be shown at the screen.</p><br/><p>A tone and a message will advise that in a few second the clock will start running.</p><br/><p>The rotary spot will complete two laps around the clock face before it will stop.</p><br/><p>Your task is to press the SPACEBAR in any moment of the SECOND LAP.</p><br/><p>At the end of the trial, you will be asked about the MOMENT that you DECIDED to press the spacebar, and then you will hace to click the clock\'s face to mark that moment.</p><br/><p>Once you have marked it, the trial will end and eventually another trial will start.</p>'
+    // },
+    // {
+    //   title: 'Instructions',
+    //   content: '<p>Sometimes a brief tone is played during the trials. Therefore, it is necessary to use headphones and set the volume properly to listen to these tones.</p><br/><p>If you forget to press the spacebar during the second lap in any trial, the next trial will be shown.</p><br/><p>It is important that you keep your eyes focused on the center of the clock and try not to blink during each trial.</p><br/><br/><br/><br/><br/><p>In the following screen a clock in demo mode will be shown to get used to it.</p>'
+    // },
+    // {
+    //   title: 'Demo',
+    //   content: '<p>Clock in demo mode. Press \'Next\' once you undestand how it works.</p><div id="demo_clock"><div id="demo_marks"><img src="img/dot.png" width="510" height="510"  id="demo_dot"/></div></div>'
+    // }
   ],
   passwordScreen: {
     title: 'Get ready',
@@ -76,10 +75,17 @@ experiment.B = {
       progress: false,
       scramble: false,
       trials: [
-        { cycle: 2560, tone: 1280, nopress: true, style: { backgroundColor: 'khaki', color: 'black'} },
-        { cycle: 2560, tone: Math.random() * (500 - 1) + 1, response: 'text', firstlap: true, trialReady: 'GET READY.<br/>Remember that you have to press the SPACEBAR during the FIRST lap.', laps: 1, stop: true, counterclockwise: true },
-        { cycle: 2560, tone: 500, getReady: 2, feedback: 2, style: { backgroundColor: 'aquamarine', color: 'black'} },
-        { cycle: 2560, tone: Math.random() * (2560 - 1280) + 1280, nopress: true, style: { backgroundColor: 'khaki', color: 'black'} }
+        // { cycle: 2560, tone: null, nopress: false, style: { backgroundColor: 'khaki', color: 'black'} },
+        // { cycle: 2560, tone: Math.random() * (500 - 1) + 1, response: 'text', firstlap: true, trialReady: 'GET READY.<br/>Remember that you have to press the SPACEBAR during the FIRST lap.', laps: 1, stop: true, counterclockwise: false },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        // { cycle: 2560, tone: 60 },
+        // { cycle: 2560, tone: 20 },
+        // { cycle: 2560, tone: 60 },
+        // { cycle: 2560, tone: 20 }
       ],
       screen: {
         title: 'End of the training phase',
@@ -89,17 +95,152 @@ experiment.B = {
     {
       description: 'Binding',
       progress: true,
-      scramble: false,
+      scramble: true,
       trials: [
-        { cycle: 2560, tone: 500 },
-        { cycle: 2560, tone: 1 },
-        { cycle: 2560 },
-        { cycle: 2560, tone: 500 },
-        { cycle: 2560, tone: 1 },
-        { cycle: 2560, tone: 1 },
-        { cycle: 2560 },
-        { cycle: 2560, tone: 500 },
-        { cycle: 2560 }
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },        
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 },
+        { cycle: 2560, tone: 20 },
+        { cycle: 2560, tone: 60 } 
       ],
       screen: {
         title: 'End of the experiment',
@@ -108,13 +249,13 @@ experiment.B = {
     }
   ],
   postScreens: [
-    {
-      title: 'Explanation',
-      content: '<p>We would like to thank you for taking part in this experiment. Without the help of people like you our research would not be possible.</p><br/><p>Now that the experiment is over, we assume that you are willing to know about its purpose.</p><br/><p>In this experiment you have been pressing spacebar at the second lap of each trial. In some trials a tone was played immediately after that, in other trials there was a delay between your action and the tone, and in other trials there was not tone at all. The purpose of the experiment was to compare your responses in each case and determine whether there is a \'binding effect\' between your action and the tone. This effect predicts that your estimates about the moment that you decide to press the spacebar are affected by the tone and will move towards the moment the tone sounded.</p><br/><p>This effect shows the discrepancies between what we think we did and we actually did in presence of external stimuli.</p><br/><p>If you are interested in this kind of studies, please visit <a href="http://www.labpsico.deusto.es">our website</a>.</p>'
-    },
-    {
-      title: 'Thank you!',
-      content: '<p>Your responses will be added to those of the other participants and analyzed statistically.</p><br/><p>Thank you very much for your collaboration.</p>'
-    }
+    // {
+    //   title: 'Explanation',
+    //   content: '<p>We would like to thank you for taking part in this experiment. Without the help of people like you our research would not be possible.</p><br/><p>Now that the experiment is over, we assume that you are willing to know about its purpose.</p><br/><p>In this experiment you have been pressing spacebar at the second lap of each trial. In some trials a tone was played immediately after that, in other trials there was a delay between your action and the tone, and in other trials there was not tone at all. The purpose of the experiment was to compare your responses in each case and determine whether there is a \'binding effect\' between your action and the tone. This effect predicts that your estimates about the moment that you decide to press the spacebar are affected by the tone and will move towards the moment the tone sounded.</p><br/><p>This effect shows the discrepancies between what we think we did and we actually did in presence of external stimuli.</p><br/><p>If you are interested in this kind of studies, please visit <a href="http://www.labpsico.deusto.es">our website</a>.</p>'
+    // },
+    // {
+    //   title: 'Thank you!',
+    //   content: '<p>Your responses will be added to those of the other participants and analyzed statistically.</p><br/><p>Thank you very much for your collaboration.</p>'
+    // }
   ]
 };

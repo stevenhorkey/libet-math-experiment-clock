@@ -1,0 +1,9 @@
+comment instructions
+
+Get rid of backwards clock
+
+Get rid of examples that play the tone before/randomly
+
+Comment out debrief
+
+72 trials of 20 and 60 (tones)
