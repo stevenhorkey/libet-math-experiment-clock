@@ -400,33 +400,46 @@ var labclock = {
   },
   storeExperimentData: function (earlyExit = false) {
     var results = '',
-        resultsEnd = 'Full results;',
+        resultsEnd = 'Full results\n',
         xhr, storageItem;
-    results += this.experiment.code + ';';
-    results += Date() + ';';
+    results += this.experiment.code + '\n';
+    results += Date() + '\n';
     storageItem = results;
-    results += navigator.userAgent + ';';
+    results += navigator.userAgent + '\n';
     for (var p = 0, lp = this.experiment.phases.length; p < lp; p++) {
-      results += this.experiment.phases[p].description + ';';
-      resultsEnd += this.experiment.phases[p].description + ';';
+      results += '\n' + this.experiment.phases[p].description + '\t';
+      results += 'Keypress\t';
+      results += 'W Report\t';
+      results += 'Tone\n';
+      resultsEnd += '\n' + this.experiment.phases[p].description + '\t';
+      resultsEnd += 'delay\t';
+      resultsEnd += 'cycle\t';
+      resultsEnd += 'cycle time\t';
+      resultsEnd += 'tone\t';
+      resultsEnd += 'tone time\t';
+      resultsEnd += 'Keypress Trial Times\t';
+      resultsEnd += 'Start Trial Times\t';
+      resultsEnd += 'End Trial Time\t';
+      resultsEnd += 'Start Trial Audio Time\n';
       for (var t = 0, lt = this.experiment.phases[p].trials.length; t < lt; t++) {
-        results += 'trial' + t + ';';
-        results += this.experiment.phases[p].trials[t].keypressTrialTimes + ';';
-        results += this.experiment.phases[p].trials[t].guessTime + ';';
-        results += this.experiment.phases[p].trials[t].tone + ';';
-        resultsEnd += 'trial' + t + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].delay + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].cycle + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].cycleTime + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].tone + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].toneTime + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].keypressTrialTimes + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].startTrialTime + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].endTrialTime + ';';
-        resultsEnd += this.experiment.phases[p].trials[t].startTrialAudioTime + ';';
+        results += 'trial' + (t+1) + '\t';
+        results += this.experiment.phases[p].trials[t].keypressTrialTimes + '\t';
+        results += this.experiment.phases[p].trials[t].guessTime + '\t';
+        results += this.experiment.phases[p].trials[t].tone + '\n';
+        resultsEnd += 'trial' + t + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].delay + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].cycle + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].cycleTime + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].tone + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].toneTime + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].keypressTrialTimes + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].startTrialTime + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].endTrialTime + '\t';
+        resultsEnd += this.experiment.phases[p].trials[t].startTrialAudioTime + '\n';
       }
     }
     results += resultsEnd;
+    console.log(results);
     if (this.experiment.postResultsURL) {
       xhr = new XMLHttpRequest();
       xhr.open('POST', this.experiment.postResultsURL, true);
@@ -457,7 +470,7 @@ var labclock = {
       // Show CSV link in a new post-screen
       var screen = {
         title: this.experiment.messages.downloadTitle,
-        content: '<p><a href="data:text/csv;base64,' + window.btoa(results) + '">' + this.experiment.messages.downloadData + '</a></p>'
+        content: '<p><a href="data:application/octet-stream;utf8,' + encodeURIComponent(results) + '">' + this.experiment.messages.downloadData + '</a></p>'
       };
       this.experiment.postScreens.push(screen);
       if(earlyExit) $('#content').html(screen.content);
