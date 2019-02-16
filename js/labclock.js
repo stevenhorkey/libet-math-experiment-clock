@@ -698,7 +698,7 @@ var labclock = {
   },
   start: function () {
     this.setButtonsListeners();
-    this.selectExperiment(true); //set it to false to select the group manually
+    this.selectExperiment(false); //set it to false to select the group manually
     this.state = this.STATE_PRE;
     this.displayState();
     if(this.sanityChecks()) {

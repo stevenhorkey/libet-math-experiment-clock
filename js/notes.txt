@@ -1,0 +1,3 @@
+experiment c silent no tones. 60 trials.
+
+experiement b 120 trials. 
