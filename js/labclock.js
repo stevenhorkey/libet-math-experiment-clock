@@ -180,7 +180,10 @@ var labclock = {
     } else { //IE
       keyChar = window.event.keyCode;
     }
-    if (keyChar == self.labclock.experiment.responseKey.charCodeAt(0)) {
+    if (keyChar == self.labclock.experiment.responseKey.charCodeAt(0)
+      || keyChar == self.labclock.experiment.responseKey2.charCodeAt(0)
+      || keyChar == self.labclock.experiment.responseKey3.charCodeAt(0)
+    ) {
       self.labclock.playFeedback(self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].feedback);
       self.labclock.storeKeypressTrialTime(e.timeStamp);
     }

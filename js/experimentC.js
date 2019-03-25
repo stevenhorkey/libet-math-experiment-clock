@@ -13,6 +13,8 @@ experiment.C = {
   //postResultsURL: 'datasent.asp',
   generateCSV: true,
   responseKey: ' ',
+  responseKey2: 'a',
+  responseKey3: 'l',
   sounds: {
     demo: [
       { file: 'media/250-440Hz_44100Hz_16bit_1000ms.wav' }
