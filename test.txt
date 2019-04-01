@@ -1,9 +1,4 @@
-comment instructions
 
-Get rid of backwards clock
+Log file should include which key is pressed
 
-Get rid of examples that play the tone before/randomly
-
-Comment out debrief
-
-72 trials of 20 and 60 (tones)
+Leave the rest of the instructions.

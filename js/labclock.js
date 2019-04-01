@@ -146,17 +146,24 @@ var labclock = {
   playFeedback: function (i) {
     i = i || 1;
     i--;
-    if (this.trialCurrentLap > 0 || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].nopress) {
-      if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone) {
-        if (!this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime) {
-          var delay = this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone / 1000;
+    if (this.trialCurrentLap >= 0 || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].nopress) {
+      // if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone) {
+        // if (!this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime) {
+          // set 0 delay for all trials here regardless of what's in experiment
+          var delay = 0;
           this.audioFeedbackNodes[i].start(this.audioContext.currentTime + delay);
           this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = (this.audioContext.currentTime - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialAudioTime) * 1000 + this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone;
-        }
-      } else {
-        this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = 1;
-      }
+        // }
+      // } else {
+      //   this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = 1;
+      // }
     }
+  },
+  storeKeyPressed: function(e) {
+    var button = e.key;
+    if(button === " ") button = "spacebar";
+    this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keysPressed.push(button);
+    console.log(e.key, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex])
   },
   storeKeypressTrialTime: function (t) {
     if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap) {
@@ -164,6 +171,8 @@ var labclock = {
     } else {
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes.push(t - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle);
     }
+    console.log(t, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle)
+    console.log('keypress time',this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes[0])
   },
   storeStartTrialTimes: function (t) {
     this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime = t;
@@ -180,17 +189,22 @@ var labclock = {
     } else { //IE
       keyChar = window.event.keyCode;
     }
-    if (keyChar == self.labclock.experiment.responseKey.charCodeAt(0)
-      || keyChar == self.labclock.experiment.responseKey2.charCodeAt(0)
-      || keyChar == self.labclock.experiment.responseKey3.charCodeAt(0)
+    console.log(keyChar,self.labclock.experiment.responseKey.charCodeAt(0),self.labclock.experiment.responseKey2.charCodeAt(0),self.labclock.experiment.responseKey3.charCodeAt(0));
+    if (keyChar === self.labclock.experiment.responseKey.charCodeAt(0)
+      || keyChar === self.labclock.experiment.responseKey2.charCodeAt(0)
+      || keyChar === self.labclock.experiment.responseKey3.charCodeAt(0)
     ) {
+      console.log('triggered')
       self.labclock.playFeedback(self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].feedback);
+      console.log(e);
+      self.labclock.storeKeyPressed(e);
       self.labclock.storeKeypressTrialTime(e.timeStamp);
     }
   },
   animationStartHandler: function (e) {
     self.labclock.expScreenCaption.innerHTML = '';
     self.labclock.storeStartTrialTimes(e.timeStamp);
+    console.log('test stamp',e.timeStamp)
     if (self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].nopress) {
       self.labclock.unsetKeyboardListener();
       self.labclock.playFeedback(self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].feedback);
@@ -265,9 +279,10 @@ var labclock = {
       this.dot.style.mozAnimationIterationCount = l;
       this.dot.style.animationIterationCount = l;
     } else {
-      this.dot.style.webkitAnimationIterationCount = 2;
-      this.dot.style.mozAnimationIterationCount = 2;
-      this.dot.style.animationIterationCount = 2;
+      // set the amount of rotations you want here. 4 in this case...
+      this.dot.style.webkitAnimationIterationCount = 4;
+      this.dot.style.mozAnimationIterationCount = 4;
+      this.dot.style.animationIterationCount = 4;
     }
     this.dot.style.webkitAnimationTimingFunction = 'linear';
     this.dot.style.mozAnimationTimingFunction = 'linear';
@@ -297,6 +312,8 @@ var labclock = {
       this.prepareFeedback(this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].feedback);
       this.trialCurrentLap = 0;
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes = [];
+      this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keysPressed = [];
+      this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap = true;
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay = Math.floor(Math.random() * (this.experiment.randomDelayMax - this.experiment.randomDelayMin + 1) + this.experiment.randomDelayMin);
       //Random delay MUST be different to the previous one, otherwise CSS3 Animation won't reset
       if (this.trialsIndex > 0) {
@@ -412,6 +429,7 @@ var labclock = {
     for (var p = 0, lp = this.experiment.phases.length; p < lp; p++) {
       results += '\n' + this.experiment.phases[p].description + ',';
       results += 'Keypress,';
+      results += 'Button Pressed,';
       results += 'W Report,';
       results += 'Tone\n';
       resultsEnd += '\n' + this.experiment.phases[p].description + ',';
@@ -427,6 +445,7 @@ var labclock = {
       for (var t = 0, lt = this.experiment.phases[p].trials.length; t < lt; t++) {
         results += 'trial' + (t+1) + ',';
         results += this.experiment.phases[p].trials[t].keypressTrialTimes + ',';
+        results += this.experiment.phases[p].trials[t].keysPressed + ',';
         results += this.experiment.phases[p].trials[t].guessTime + ',';
         results += this.experiment.phases[p].trials[t].tone + '\n';
         resultsEnd += 'trial' + t + ',';
