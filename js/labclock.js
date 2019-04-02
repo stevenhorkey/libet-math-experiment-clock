@@ -189,10 +189,9 @@ var labclock = {
     } else { //IE
       keyChar = window.event.keyCode;
     }
-    console.log(keyChar,self.labclock.experiment.responseKey.charCodeAt(0),self.labclock.experiment.responseKey2.charCodeAt(0),self.labclock.experiment.responseKey3.charCodeAt(0));
-    if (keyChar === self.labclock.experiment.responseKey.charCodeAt(0)
+    // console.log(keyChar);
+    if (keyChar === self.labclock.experiment.responseKey1.charCodeAt(0)
       || keyChar === self.labclock.experiment.responseKey2.charCodeAt(0)
-      || keyChar === self.labclock.experiment.responseKey3.charCodeAt(0)
     ) {
       console.log('triggered')
       self.labclock.playFeedback(self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].feedback);
@@ -206,10 +205,12 @@ var labclock = {
     self.labclock.storeStartTrialTimes(e.timeStamp);
     console.log('test stamp',e.timeStamp)
     if (self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].nopress) {
+      console.log('no press???')
       self.labclock.unsetKeyboardListener();
       self.labclock.playFeedback(self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].feedback);
       self.labclock.storeKeypressTrialTime(0);
     } else {
+      console.log('set keyboard listener')
       self.labclock.setKeyboardListener();
     }
   },
@@ -238,6 +239,7 @@ var labclock = {
     this.pause();
   },
   setKeyboardListener: function () {
+    console.log('keypress listner')
     window.addEventListener('keypress', this.keypressHandler, false);
   },
   unsetKeyboardListener: function () {
@@ -253,6 +255,7 @@ var labclock = {
     this.buttonNextElement.addEventListener('click', this.clickNext.bind(this), false);
   },
   setClockListeners: function () {
+    console.log('setClockListeners')
     this.dot.addEventListener('webkitAnimationStart', this.animationStartHandler, false);
     this.dot.addEventListener('animationstart', this.animationStartHandler, false);
     this.dot.addEventListener('webkitAnimationIteration', this.animationIterationHandler, false);
@@ -314,13 +317,16 @@ var labclock = {
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes = [];
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keysPressed = [];
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap = true;
-      this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay = Math.floor(Math.random() * (this.experiment.randomDelayMax - this.experiment.randomDelayMin + 1) + this.experiment.randomDelayMin);
+
+      // commented code below creates delay before trial starts
+      // this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay = Math.floor(Math.random() * (this.experiment.randomDelayMax - this.experiment.randomDelayMin + 1) + this.experiment.randomDelayMin);
       //Random delay MUST be different to the previous one, otherwise CSS3 Animation won't reset
-      if (this.trialsIndex > 0) {
-        while (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay === this.experiment.phases[this.phasesIndex].trials[this.trialsIndex-1].delay) {
-          this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay = Math.floor(Math.random() * (this.experiment.randomDelayMax - this.experiment.randomDelayMin + 1) + this.experiment.randomDelayMin);
-        }
-      }
+      // if (this.trialsIndex > 0) {
+      //   while (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay === this.experiment.phases[this.phasesIndex].trials[this.trialsIndex-1].delay) {
+      //     this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay = Math.floor(Math.random() * (this.experiment.randomDelayMax - this.experiment.randomDelayMin + 1) + this.experiment.randomDelayMin);
+      //   }
+      // }
+
       this.setClock(this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].counterclockwise, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].laps);
       progress = this.trialsIndex * 800 / this.experiment.phases[this.phasesIndex].trials.length;
       this.expScreenProgress.style.width = progress + 'px';
@@ -386,6 +392,7 @@ var labclock = {
     this.showButtons(false, true, false);
   },
   waitForToneToStartSelecting: function (t) {
+    console.log('wait for tone to start selecting')
     if (self.labclock.audioContext.currentTime < t ) {
       setTimeout(self.labclock.waitForToneToStartSelecting, 5, t);
     } else {
@@ -543,24 +550,37 @@ var labclock = {
       case this.STATE_TRIAL_SELECTING:
         var ok = true;
         if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].response === 'text') {
+          console.log('1')
           // angle stores the value of the textbox, not the corresponding angle when using response: 'text'
           this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].angle = this.expScreenTextboxValue.value;
           // guessTime stores the estimation in ms considering the cycle time
           if (isNaN(parseFloat(this.expScreenTextboxValue.value))) {
+          console.log('2')
+
             this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime = 0;
             ok = false;
           } else {
+          console.log('3')
+
             this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime = this.expScreenTextboxValue.value * this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle / 60;
             this.expScreenTextbox.style.display = 'none';
             ok = true;
 
           }
         } else {
+          console.log('4')
+
           this.unsetWhenSelectingListeners();
         }
         if (ok) {
-          this.trialsIndex++;
-          this.startTrial(true);
+          var _this = this;
+          this.expScreenCaption.innerHTML = this.experiment.messages.initNextTrial;
+          document.body.onkeyup = function(e){
+              if(e.keyCode == 32){
+                _this.trialsIndex++;
+                _this.startTrial(true);
+              }
+          }
         }
         break;
       case this.STATE_PHASE_END:
@@ -719,6 +739,7 @@ var labclock = {
     }
   },
   start: function () {
+    console.log('start function')
     this.setButtonsListeners();
     this.selectExperiment(false); //set it to false to select the group manually
     this.state = this.STATE_PRE;
