@@ -52,6 +52,7 @@ var labclock = {
   postScreensIndex: 0,
   trialCurrentLap: 0,
   clockRadius: 225,
+  alreadyPressedOnTrial: false,
   //Methods
   initAudio: function () {
     try {
@@ -113,8 +114,15 @@ var labclock = {
     this.preScreenContent.innerHTML = this.experiment.passwordScreen.content;
   },
   startPhase: function () {
-    this.trialsIndex = 0;
-    this.startTrial(true);
+    var _this = this;
+    this.expScreenCaption.innerHTML = 'Press the spacebar to start.';
+    document.body.onkeyup = function(e){
+      if(e.keyCode == 32) {
+        _this.trialsIndex = 0;
+        _this.startTrial(true);
+      }
+    }
+    
   },
   playDemo: function () {
     this.audioGetReadyElements[0].play();
@@ -147,11 +155,17 @@ var labclock = {
     i = i || 1;
     i--;
     if (this.trialCurrentLap > 0 || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].nopress) {
-      if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone) {
+      // Now allows tone of 0 delay. To disable tone, define it as null in the trial
+      if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone !== null) {
         if (!this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime) {
+          // the first practice trial seems to not ask for 2 because the tone time current time start trial audio time, and tone are all zero there for some reason. This seems to only effect the first trial
           var delay = this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone / 1000;
           this.audioFeedbackNodes[i].start(this.audioContext.currentTime + delay);
           this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = (this.audioContext.currentTime - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialAudioTime) * 1000 + this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone;
+          // console.log('tone time', this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime)
+          // console.log('current TIme',this.audioContext.currentTime)
+          // console.log('start trial audio time',this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialAudioTime)
+          // console.log('tone',this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone)
         }
       } else {
         this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = 1;
@@ -159,11 +173,17 @@ var labclock = {
     }
   },
   storeKeypressTrialTime: function (t) {
+    // console.log(t);
     if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap) {
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes.push(t - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime);
     } else {
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes.push(t - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle);
     }
+    this.unsetKeyboardListener();
+  },
+  storeKeypressTrialValue: function (e) {
+    // console.log(t);
+      this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialValues.push(e.key);
   },
   storeStartTrialTimes: function (t) {
     this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime = t;
@@ -180,9 +200,11 @@ var labclock = {
     } else { //IE
       keyChar = window.event.keyCode;
     }
-    if (keyChar == self.labclock.experiment.responseKey.charCodeAt(0)) {
+    // Able to choose response key 1 or response key 2
+    if (keyChar == self.labclock.experiment.responseKey1.charCodeAt(0) || keyChar == self.labclock.experiment.responseKey2.charCodeAt(0)) {
       self.labclock.playFeedback(self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].feedback);
       self.labclock.storeKeypressTrialTime(e.timeStamp);
+      self.labclock.storeKeypressTrialValue(e)
     }
   },
   animationStartHandler: function (e) {
@@ -224,6 +246,7 @@ var labclock = {
     window.addEventListener('keypress', this.keypressHandler, false);
   },
   unsetKeyboardListener: function () {
+
     window.removeEventListener('keypress', this.keypressHandler, false);
   },
   setAudioListeners: function (i) {
@@ -244,7 +267,7 @@ var labclock = {
     this.dot.addEventListener('animationend', this.animationEndHandler, false);
   },
   setClock: function (d, c, s, l) {
-    var delay = d / 1000;
+    var delay = 0;
     delay += 's';
     var duration = c / 1000;
     duration += 's';
@@ -262,9 +285,10 @@ var labclock = {
       this.dot.style.mozAnimationIterationCount = l;
       this.dot.style.animationIterationCount = l;
     } else {
-      this.dot.style.webkitAnimationIterationCount = 2;
-      this.dot.style.mozAnimationIterationCount = 2;
-      this.dot.style.animationIterationCount = 2;
+      // Now 4 laps instead of 2
+      this.dot.style.webkitAnimationIterationCount = 4;
+      this.dot.style.mozAnimationIterationCount = 4;
+      this.dot.style.animationIterationCount = 4;
     }
     this.dot.style.webkitAnimationTimingFunction = 'linear';
     this.dot.style.mozAnimationTimingFunction = 'linear';
@@ -288,12 +312,16 @@ var labclock = {
     this.dot.style.animationPlayState = 'running';
   },
   startTrial: function (playSound) {
+    document.body.onkeyup = function(e){
+      if(e.keyCode == 32) return;
+    }
     var progress;
     if (this.trialsIndex < this.experiment.phases[this.phasesIndex].trials.length) {
       this.dot.style.display = 'block';
       this.prepareFeedback(this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].feedback);
       this.trialCurrentLap = 0;
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes = [];
+      this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialValues = [];
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].delay = Math.floor(Math.random() * (this.experiment.randomDelayMax - this.experiment.randomDelayMin + 1) + this.experiment.randomDelayMin);
       //Random delay MUST be different to the previous one, otherwise CSS3 Animation won't reset
       if (this.trialsIndex > 0) {
@@ -409,6 +437,7 @@ var labclock = {
     for (var p = 0, lp = this.experiment.phases.length; p < lp; p++) {
       results += '\n' + this.experiment.phases[p].description + ',';
       results += 'Keypress,';
+      results += 'Key Value,';
       results += 'W Report,';
       results += 'Tone\n';
       resultsEnd += '\n' + this.experiment.phases[p].description + ',';
@@ -418,12 +447,14 @@ var labclock = {
       resultsEnd += 'tone,';
       resultsEnd += 'tone time,';
       resultsEnd += 'Keypress Trial Times,';
+      resultsEnd += 'Keypress Trial Value,';
       resultsEnd += 'Start Trial Times,';
       resultsEnd += 'End Trial Time,';
       resultsEnd += 'Start Trial Audio Time\n';
       for (var t = 0, lt = this.experiment.phases[p].trials.length; t < lt; t++) {
         results += 'trial' + (t+1) + ',';
         results += this.experiment.phases[p].trials[t].keypressTrialTimes + ',';
+        results += this.experiment.phases[p].trials[t].keypressTrialValues + ',';
         results += this.experiment.phases[p].trials[t].guessTime + ',';
         results += this.experiment.phases[p].trials[t].tone + '\n';
         resultsEnd += 'trial' + t + ',';
@@ -433,13 +464,13 @@ var labclock = {
         resultsEnd += this.experiment.phases[p].trials[t].tone + ',';
         resultsEnd += this.experiment.phases[p].trials[t].toneTime + ',';
         resultsEnd += this.experiment.phases[p].trials[t].keypressTrialTimes + ',';
+        resultsEnd += this.experiment.phases[p].trials[t].keypressTrialValues + ',';
         resultsEnd += this.experiment.phases[p].trials[t].startTrialTime + ',';
         resultsEnd += this.experiment.phases[p].trials[t].endTrialTime + ',';
         resultsEnd += this.experiment.phases[p].trials[t].startTrialAudioTime + '\n';
       }
     }
     results += resultsEnd;
-    console.log(results);
     if (this.experiment.postResultsURL) {
       xhr = new XMLHttpRequest();
       xhr.open('POST', this.experiment.postResultsURL, true);
@@ -537,8 +568,16 @@ var labclock = {
           this.unsetWhenSelectingListeners();
         }
         if (ok) {
-          this.trialsIndex++;
-          this.startTrial(true);
+          ok = false;
+          this.showButtons(false, false, false);
+          this.expScreenCaption.innerHTML = 'Press the spacebar to start the next trial.';
+          var _this = this;
+          document.body.onkeyup = function(e){
+            if(e.keyCode == 32) {
+              _this.trialsIndex++;
+              _this.startTrial(true);
+            }
+          }
         }
         break;
       case this.STATE_PHASE_END:
