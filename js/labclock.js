@@ -156,9 +156,9 @@ var labclock = {
     i--;
     if (this.trialCurrentLap > 0 || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].nopress) {
       // Now allows tone of 0 delay. To disable tone, define it as null in the trial
+
       if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone !== null) {
         if (!this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime) {
-          // the first practice trial seems to not ask for 2 because the tone time current time start trial audio time, and tone are all zero there for some reason. This seems to only effect the first trial
           var delay = this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone / 1000;
           this.audioFeedbackNodes[i].start(this.audioContext.currentTime + delay);
           this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = (this.audioContext.currentTime - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialAudioTime) * 1000 + this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone;
@@ -168,6 +168,7 @@ var labclock = {
           // console.log('tone',this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone)
         }
       } else {
+        console.log('setting tone time to 1')
         this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = 1;
       }
     }
@@ -186,6 +187,7 @@ var labclock = {
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialValues.push(e.key);
   },
   storeStartTrialTimes: function (t) {
+    console.log('set something to current time')
     this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime = t;
     this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialAudioTime = this.audioContext.currentTime;
   },
@@ -208,6 +210,7 @@ var labclock = {
     }
   },
   animationStartHandler: function (e) {
+    console.log('triggered animation start handler')
     self.labclock.expScreenCaption.innerHTML = '';
     self.labclock.storeStartTrialTimes(e.timeStamp);
     if (self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].nopress) {
@@ -401,6 +404,7 @@ var labclock = {
     }
   },
   startSelecting: function () {
+    console.log(this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime)
     if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime) {
       this.dot.style.webkitAnimationPlayState = 'paused';
       this.dot.style.mozAnimationPlayState = 'paused';
@@ -517,6 +521,8 @@ var labclock = {
     this.postScreenContent.innerHTML = this.experiment.postScreens[i].content;
   },
   nextPhase: function () {
+    console.log('next phase', this.trialsIndex)
+    this.trialsIndex = 0;
     this.phasesIndex++;
     if (this.phasesIndex < this.experiment.phases.length) {
       this.state = this.STATE_PHASE_START;
@@ -550,6 +556,7 @@ var labclock = {
         }
         break;
       case this.STATE_TRIAL_SELECTING:
+        console.log('case start trial selecting')
         var ok = true;
         if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].response === 'text') {
           // angle stores the value of the textbox, not the corresponding angle when using response: 'text'
@@ -581,6 +588,7 @@ var labclock = {
         }
         break;
       case this.STATE_PHASE_END:
+        console.log('case phase end')
         this.nextPhase();
         break;
     }
@@ -741,6 +749,7 @@ var labclock = {
     this.state = this.STATE_PRE;
     this.displayState();
     if(this.sanityChecks()) {
+      console.log('passed sanity checks')
       this.initAudio();
       this.setClockListeners();
     }
