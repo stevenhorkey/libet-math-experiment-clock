@@ -1,4 +1,0 @@
-
-Log file should include which key is pressed
-
-Leave the rest of the instructions.

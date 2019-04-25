@@ -1,0 +1,5 @@
+Most of the parameters you may want to change such as tone delay, button's to press, instructions text, number of trials and phases can be changed in the experimentA.js file, or something similarly named. 
+
+More in depth changes including clock rotation count and others must be changed in labclock js. Be cautious when working on that file , as there are a lot of interconnected relations between functions and it's easy to fix or format something while breaking another thing else where. 
+
+I've commented 

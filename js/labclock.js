@@ -50,7 +50,8 @@ var labclock = {
   phasesIndex: 0,
   trialsIndex: 0,
   postScreensIndex: 0,
-  trialCurrentLap: 0,
+  trialCurrentLap: 1,
+  trialLapPressed: 1,
   clockRadius: 225,
   //Methods
   initAudio: function () {
@@ -87,6 +88,7 @@ var labclock = {
     }
   },
   showButtons: function (p, o, n) {
+    // takes boolean values and determines which buttons should show on the screen.
     var displayPrevious = p ? 'block' : 'none',
         displayOK = o ? 'block' : 'none',
         displayNext = n ? 'block' : 'none';
@@ -99,6 +101,7 @@ var labclock = {
     }
   },
   showPreScreen: function (i) {
+    // Displays pre-experiment screen with necessary buttons and text content.
     if (i > 0) {
       this.showButtons(true, false, true);
     } else {
@@ -108,18 +111,22 @@ var labclock = {
     this.preScreenContent.innerHTML = this.experiment.preScreens[i].content;
   },
   showPasswordScreen: function () {
+    // Displays password screen with proper buttons and text content
     this.showButtons(false, true, false);
     this.preScreenTitle.innerHTML = this.experiment.passwordScreen.title;
     this.preScreenContent.innerHTML = this.experiment.passwordScreen.content;
   },
   startPhase: function () {
+    // initiates new phase and resets the trial count to be indexed during the new phase.
     this.trialsIndex = 0;
     this.startTrial(true);
   },
   playDemo: function () {
+    // Initiate audio
     this.audioGetReadyElements[0].play();
   },
   playReady: function (i) {
+    // Sets program state to trial in process, and starts clock.
     i = i || 1; 
     // this.audioGetReadyElements[--i].play();
     this.state = this.STATE_TRIAL_RUNNING;
@@ -146,13 +153,16 @@ var labclock = {
   playFeedback: function (i) {
     i = i || 1;
     i--;
+    // Allows press during firstlap if trial has that property. 
     if (this.trialCurrentLap >= 0 || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap || this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].nopress) {
       // if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone) {
         // if (!this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime) {
-          // set 0 delay for all trials here regardless of what's in experiment
+
+          // set 0 delay for all trials here regardless of what's in experiment. Author says this may mess with the style animation of the dot but nothing is out of order. 
           var delay = 0;
           this.audioFeedbackNodes[i].start(this.audioContext.currentTime + delay);
           this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = (this.audioContext.currentTime - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialAudioTime) * 1000 + this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].tone;
+
         // }
       // } else {
       //   this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].toneTime = 1;
@@ -160,12 +170,14 @@ var labclock = {
     }
   },
   storeKeyPressed: function(e) {
+    // Store Keypress value to be exported to data file later
     var button = e.key;
     if(button === " ") button = "spacebar";
     this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keysPressed.push(button);
-    console.log(e.key, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex])
+    // console.log(e.key, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex])
   },
   storeKeypressTrialTime: function (t) {
+    // Store keypress time to be exported to data file later.
     if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap) {
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes.push(t - this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime);
     } else {
@@ -175,6 +187,7 @@ var labclock = {
     console.log('keypress time',this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes[0])
   },
   storeStartTrialTimes: function (t) {
+    // Store when a trial started to be used in storeKeypressTrialTime later
     this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialTime = t;
     this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].startTrialAudioTime = this.audioContext.currentTime;
   },
@@ -189,33 +202,34 @@ var labclock = {
     } else { //IE
       keyChar = window.event.keyCode;
     }
-    // console.log(keyChar);
+    // If statement below allows for the TWO key values defined in experiment file. 
     if (keyChar === self.labclock.experiment.responseKey1.charCodeAt(0)
       || keyChar === self.labclock.experiment.responseKey2.charCodeAt(0)
     ) {
-      console.log('triggered')
       self.labclock.playFeedback(self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].feedback);
-      console.log(e);
       self.labclock.storeKeyPressed(e);
       self.labclock.storeKeypressTrialTime(e.timeStamp);
+      window.removeEventListener('keypress', this.keypressHandler, false);
+      self.labclock.trialLapPressed = self.labclock.trialCurrentLap;
+      console.log('set this.trialLapPressed',self.labclock.trialLapPressed,self.labclock.trialCurrentLap)
     }
   },
   animationStartHandler: function (e) {
+    // Starts clock animation
+    console.log('animation start handler')
     self.labclock.expScreenCaption.innerHTML = '';
     self.labclock.storeStartTrialTimes(e.timeStamp);
-    console.log('test stamp',e.timeStamp)
     if (self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].nopress) {
-      console.log('no press???')
       self.labclock.unsetKeyboardListener();
       self.labclock.playFeedback(self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].feedback);
       self.labclock.storeKeypressTrialTime(0);
     } else {
-      console.log('set keyboard listener')
       self.labclock.setKeyboardListener();
     }
   },
   animationIterationHandler: function (e) {
     self.labclock.trialCurrentLap++;
+    console.log('incremented tiral lap', self.labclock.trialCurrentLap)
     if (self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].stop && self.labclock.experiment.phases[self.labclock.phasesIndex].trials[self.labclock.trialsIndex].toneTime) {
       self.labclock.dot.style.webkitAnimation = 'none';
       self.labclock.dot.style.mozAnimation = 'none';
@@ -313,9 +327,11 @@ var labclock = {
     if (this.trialsIndex < this.experiment.phases[this.phasesIndex].trials.length) {
       this.dot.style.display = 'block';
       this.prepareFeedback(this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].feedback);
-      this.trialCurrentLap = 0;
+      this.trialCurrentLap = 1;
+      console.log('reset trialCurrentLap')
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keypressTrialTimes = [];
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].keysPressed = [];
+      // Allows first lap ON ALL TRIALS to be triggered
       this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].firstlap = true;
 
       // commented code below creates delay before trial starts
@@ -357,7 +373,13 @@ var labclock = {
       if (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].counterclockwise) {
         this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime = (360-degree) * this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle / 360;
       } else {
-        this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime = degree * this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle / 360;
+        console.log(degree, this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle)
+        console.log(this.trialLapPressed, 'lap pressed')
+        console.log('degree * currentLap', degree * this.trialLapPressed)
+        console.log('guess time', ((degree * this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle / 360) + ( (this.trialLapPressed - 1) * this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle)));
+
+        this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime = ((degree * this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle / 360) + ( (this.trialLapPressed - 1) * this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle));
+
       }
       this.enableOKWhenSelected();
     }
@@ -379,8 +401,18 @@ var labclock = {
       setTimeout(this.startNextTrialHandler, 10);
   }, 
   startNextTrialHandler: function (e) {
-    self.labclock.trialsIndex++;
-    self.labclock.startTrial(true);
+    var _this = this;
+    self.labclock.expScreenCaption.innerHTML = 'please press spacebar to begin the trial';
+    // onkeyup function set to wait for spacebar before continuing.
+    document.body.onkeyup = function(e){
+        
+        if(e.keyCode == 32){
+          console.log('triggered spacebar!!!')
+          self.labclock.trialsIndex++;
+          self.labclock.startTrial(true);
+          document.body.onkeyup = null;
+        }
+    }
   },
   setWhenSelectingListeners: function () {
     this.clock.addEventListener('click', this.clickWhenSelectingHandler, false);
@@ -392,7 +424,8 @@ var labclock = {
     this.showButtons(false, true, false);
   },
   waitForToneToStartSelecting: function (t) {
-    console.log('wait for tone to start selecting')
+    // 
+    console.log('wait for tone to start selecting');
     if (self.labclock.audioContext.currentTime < t ) {
       setTimeout(self.labclock.waitForToneToStartSelecting, 5, t);
     } else {
@@ -426,6 +459,7 @@ var labclock = {
     this.expScreenContent.innerHTML = this.experiment.phases[i].screen.content;
   },
   storeExperimentData: function (earlyExit = false) {
+    // This writes the csv file for download. If you wanted to add or remove a column of data, you will need to do so in both for loops.
     var results = '',
         resultsEnd = 'Full results\n',
         xhr, storageItem;
@@ -494,7 +528,7 @@ var labclock = {
     }
   },
   createCSV: function(results, earlyExit = false){
-    // console.log(results);
+    // Creates element for csv download on user page 
     if (this.experiment.generateCSV || !this.experiment.postResultsURL) {
       // Show CSV link in a new post-screen
       var screen = {
@@ -537,6 +571,7 @@ var labclock = {
     }
   },
   clickOK: function () {
+    console.log(this.state);
     switch (this.state) {
       case this.STATE_PASSWORD:
         var c = document.getElementById('pre_password_text').value;
@@ -555,30 +590,32 @@ var labclock = {
           this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].angle = this.expScreenTextboxValue.value;
           // guessTime stores the estimation in ms considering the cycle time
           if (isNaN(parseFloat(this.expScreenTextboxValue.value))) {
-          console.log('2')
-
             this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime = 0;
             ok = false;
           } else {
-          console.log('3')
-
-            this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime = this.expScreenTextboxValue.value * this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle / 60;
+            console.log('this.trialCurrentLap')
+            this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime = this.expScreenTextboxValue.value * (this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle * this.trialCurrentLap) / 60;
             this.expScreenTextbox.style.display = 'none';
             ok = true;
 
           }
         } else {
-          console.log('4')
-
           this.unsetWhenSelectingListeners();
         }
+        // console.log('guess time',this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].guessTime)
+        // console.log('text box value',this.expScreenTextboxValue.value)
+        // console.log('cycle',this.experiment.phases[this.phasesIndex].trials[this.trialsIndex].cycle)
         if (ok) {
           var _this = this;
           this.expScreenCaption.innerHTML = this.experiment.messages.initNextTrial;
+          // onkeyup function set to wait for spacebar before continuing.
           document.body.onkeyup = function(e){
+              
               if(e.keyCode == 32){
+                console.log('triggered spacebar!!!')
                 _this.trialsIndex++;
                 _this.startTrial(true);
+                document.body.onkeyup = null;
               }
           }
         }
@@ -623,22 +660,37 @@ var labclock = {
         this.showPasswordScreen();
         break;
       case this.STATE_PHASE_START:
-        this.preScreen.style.display = 'none';
-        this.expScreen.style.display = 'block';
-        this.expScreenContent.style.display = 'none';
-        this.expScreenTextbox.style.display = 'none';
-        this.expScreenTitle.innerHTML = '';
-        this.expScreenClock.style.display = 'block';
-        this.showButtons(false, false, false);
-        if(this.experiment.phases[this.phasesIndex].progress) {
-          this.expScreenProgress.style.display = 'block';
-        } else {
-          this.expScreenProgress.style.display = 'none';
+        
+       
+        var _this = this;
+        this.expScreenCaption.innerHTML = this.experiment.messages.initNextTrial;
+        this.preScreenContent.innerHTML = 'Please press the space bar to begin.'
+        document.body.onkeyup = function(e){
+          if(e.keyCode == 32){
+
+            _this.preScreen.style.display = 'none';
+            _this.expScreen.style.display = 'block';
+            _this.expScreenContent.style.display = 'none';
+            _this.expScreenTextbox.style.display = 'none';
+            _this.expScreenTitle.innerHTML = '';
+            _this.expScreenClock.style.display = 'block';
+            _this.showButtons(false, false, false);
+            if(_this.experiment.phases[_this.phasesIndex].progress) {
+              _this.expScreenProgress.style.display = 'block';
+            } else {
+              _this.expScreenProgress.style.display = 'none';
+            }
+            if(_this.experiment.phases[_this.phasesIndex].scramble) {
+              _this.fisherYates(_this.experiment.phases[_this.phasesIndex].trials);
+            }
+
+
+            _this.startPhase();
+
+            document.body.onkeyup = null;
+
+          }
         }
-        if(this.experiment.phases[this.phasesIndex].scramble) {
-          this.fisherYates(this.experiment.phases[this.phasesIndex].trials);
-        }
-        this.startPhase();
         break;
       case this.STATE_TRIAL_READY:
         this.showButtons(false, false, false);
@@ -739,7 +791,6 @@ var labclock = {
     }
   },
   start: function () {
-    console.log('start function')
     this.setButtonsListeners();
     this.selectExperiment(false); //set it to false to select the group manually
     this.state = this.STATE_PRE;
